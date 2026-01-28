@@ -42,7 +42,6 @@ export default function Dashboard() {
           }
         });
 
-        // Ensure no negative pending due to bad data
         const pending = Math.max(0, paid - refunded);
 
         setStats({
@@ -117,47 +116,53 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Visual Bar Chart (CSS based) */}
+      {/* Visual Bar Chart (CSS based) - IMPROVED */}
       {!loading && stats.totalPaid > 0 && (
         <div className='mb-8 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700'>
           <h3 className='text-lg font-bold text-gray-800 dark:text-white mb-6'>Balance General</h3>
-          <div className='flex items-end space-x-8 h-64 border-b border-gray-200 dark:border-gray-700 pb-2'>
-            {/* Bar: Total Paid */}
-            <div className='flex-1 flex flex-col justify-end items-center group relative'>
-               <div className='text-xs font-bold text-blue-600 dark:text-blue-400 mb-2 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6'>
+          {/* Chart Container - Fixed height 256px (h-64) */}
+          <div className='flex items-end justify-center space-x-8 h-64 border-b border-gray-200 dark:border-gray-700 pb-2'>
+            
+            {/* Bar: Yo Pagué */}
+            <div className='flex flex-col items-center group relative w-24 h-full justify-end'>
+               <div className='absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs py-1 px-2 rounded mb-2 z-20 pointer-events-none whitespace-nowrap'>
                  {formatCurrency(stats.totalPaid)}
                </div>
                <div 
-                 className='w-full max-w-[100px] bg-blue-500 rounded-t-lg hover:bg-blue-600 transition-all duration-500 relative'
+                 className='w-full bg-blue-600 dark:bg-blue-500 rounded-t-lg hover:bg-blue-700 dark:hover:bg-blue-400 transition-all duration-300 shadow-md relative'
                  style={{ height: '100%' }}
                >
-                 <div className='absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity animate-pulse' />
+                 <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-t-lg' />
                </div>
-               <p className='text-sm text-gray-600 dark:text-gray-400 mt-3 font-medium'>Yo Pagué</p>
+               <p className='text-sm font-bold text-gray-600 dark:text-gray-400 mt-3 text-center'>Yo Pagué</p>
             </div>
 
-            {/* Bar: Total Refunded */}
-            <div className='flex-1 flex flex-col justify-end items-center group relative'>
-               <div className='text-xs font-bold text-green-600 dark:text-green-400 mb-2 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6'>
+            {/* Bar: Me Pagaron */}
+            <div className='flex flex-col items-center group relative w-24 h-full justify-end'>
+               <div className='absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs py-1 px-2 rounded mb-2 z-20 pointer-events-none whitespace-nowrap'>
                  {formatCurrency(stats.totalRefunded)}
                </div>
                <div 
-                 className='w-full max-w-[100px] bg-green-500 rounded-t-lg hover:bg-green-600 transition-all duration-500'
-                 style={{ height: `${Math.min((stats.totalRefunded / stats.totalPaid) * 100, 100)}%` }}
-               />
-               <p className='text-sm text-gray-600 dark:text-gray-400 mt-3 font-medium'>Me Pagaron</p>
+                 className='w-full bg-green-600 dark:bg-green-500 rounded-t-lg hover:bg-green-700 dark:hover:bg-green-400 transition-all duration-300 shadow-md relative'
+                 style={{ height: `${Math.max((stats.totalRefunded / stats.totalPaid) * 100, 2)}%` }} 
+               >
+                  <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-t-lg' />
+               </div>
+               <p className='text-sm font-bold text-gray-600 dark:text-gray-400 mt-3 text-center'>Me Pagaron</p>
             </div>
              
-             {/* Bar: Pending */ }
-             <div className='flex-1 flex flex-col justify-end items-center group relative'>
-                <div className='text-xs font-bold text-orange-600 dark:text-orange-400 mb-2 opacity-0 group-hover:opacity-100 transition-opacity absolute -top-6'>
+             {/* Bar: Pendiente */}
+             <div className='flex flex-col items-center group relative w-24 h-full justify-end'>
+                <div className='absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs py-1 px-2 rounded mb-2 z-20 pointer-events-none whitespace-nowrap'>
                  {formatCurrency(stats.totalPending)}
                </div>
                <div 
-                 className='w-full max-w-[100px] bg-orange-500 rounded-t-lg hover:bg-orange-600 transition-all duration-500'
-                 style={{ height: `${Math.min((stats.totalPending / stats.totalPaid) * 100, 100)}%` }}
-               />
-               <p className='text-sm text-gray-600 dark:text-gray-400 mt-3 font-medium'>Pendiente</p>
+                 className='w-full bg-orange-600 dark:bg-orange-500 rounded-t-lg hover:bg-orange-700 dark:hover:bg-orange-400 transition-all duration-300 shadow-md relative'
+                 style={{ height: `${Math.max((stats.totalPending / stats.totalPaid) * 100, 2)}%` }} 
+               >
+                  <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-t-lg' />
+               </div>
+               <p className='text-sm font-bold text-gray-600 dark:text-gray-400 mt-3 text-center'>Pendiente</p>
              </div>
           </div>
         </div>
