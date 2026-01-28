@@ -1,12 +1,13 @@
 ﻿import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Plus, Search, Loader2, Edit, Trash2 } from 'lucide-react';
 
 export default function PaymentList() {
+  const [searchParams] = useSearchParams();
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,14 +37,12 @@ export default function PaymentList() {
     try {
       const { error } = await supabase.from('payments').delete().eq('id', id);
       if (error) throw error;
-      // Refresh local state without full reload
       setPayments(prev => prev.filter(p => p.id !== id));
     } catch (err: any) {
       alert('Error al eliminar: ' + err.message);
     }
   };
 
-  // Safe filter function
   const filteredPayments = payments.filter(p => {
     if (!p) return false;
     const term = searchTerm.toLowerCase();
@@ -53,30 +52,19 @@ export default function PaymentList() {
   });
 
   const safeFormatCurrency = (val: any) => {
-    if (val === null || val === undefined) return 'S/ 0.00';
     const num = Number(val);
     if (isNaN(num)) return 'S/ 0.00';
-    try {
-      return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(num);
-    } catch {
-      return 'S/ ' + num.toFixed(2);
-    }
+    return new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(num);
   };
 
   const safeFormatDate = (val: any) => {
     if (!val) return '-';
-    try {
-      const parts = val.split('-');
-      if (parts.length !== 3) return val;
-      return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    } catch {
-      return val;
-    }
+    const parts = val.split('-');
+    if (parts.length !== 3) return val;
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
   };
 
-  if (error) {
-    return <div className="p-4 text-red-500">{error}</div>;
-  }
+  if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
     <div>
@@ -126,24 +114,16 @@ export default function PaymentList() {
                </thead>
                <tbody className='bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700'>
                  {filteredPayments.map((payment) => (
-                   <tr key={payment.id || Math.random()} className='hover:bg-gray-50 dark:hover:bg-gray-700/50 transition'>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
-                        {safeFormatDate(payment.date)}
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white'>
-                        {payment.service_name}
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
-                        {payment.beneficiary || '-'}
-                      </td>
-                      <td className='px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white'>
-                        {safeFormatCurrency(payment.amount)}
-                      </td>
+                   <tr key={payment.id} className='hover:bg-gray-50 dark:hover:bg-gray-700/50 transition'>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>{safeFormatDate(payment.date)}</td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white'>{payment.service_name}</td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>{payment.beneficiary || '-'}</td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white'>{safeFormatCurrency(payment.amount)}</td>
                       <td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
                          <Link to={`/payments/${payment.id}/edit`} className='text-blue-600 hover:text-blue-900 dark:hover:text-blue-400 mr-3 inline-block'>
                             <Edit className='w-4 h-4' />
                          </Link>
-                         <button onClick={() => handleDelete(payment.id)} className='text-red-600 hover:text-red-900 dark:hover:text-red-400 inline-block' title='Eliminar'>
+                         <button onClick={() => handleDelete(payment.id)} className='text-red-600 hover:text-red-900 dark:hover:text-red-400 inline-block'>
                             <Trash2 className='w-4 h-4' />
                          </button>
                       </td>
