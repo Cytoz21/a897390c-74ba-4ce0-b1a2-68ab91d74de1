@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+﻿import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import AppLayout from './components/Layout/AppLayout'
 import Login from './pages/Auth/Login'
@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -29,13 +29,13 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<Dashboard />} />
-           <Route path="payments" element={<PaymentList />} />
+          <Route path="payments" element={<PaymentList />} />
           <Route path="payments/new" element={<PaymentForm />} />
           <Route path="payments/:id/edit" element={<PaymentForm />} />
           <Route path="debts" element={<DebtsByPerson />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </Router>
   )
 }
 
