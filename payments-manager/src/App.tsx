@@ -6,6 +6,7 @@ import Register from './pages/Auth/Register'
 import Dashboard from './pages/Dashboard'
 import PaymentList from './pages/Payments/PaymentList'
 import PaymentForm from './pages/Payments/PaymentForm'
+import DebtsByPerson from './pages/Debts/DebtsByPerson'
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session, loading } = useAuth();
@@ -28,9 +29,10 @@ function App() {
           </ProtectedRoute>
         }>
           <Route index element={<Dashboard />} />
-          <Route path="payments" element={<PaymentList />} />
+           <Route path="payments" element={<PaymentList />} />
           <Route path="payments/new" element={<PaymentForm />} />
           <Route path="payments/:id/edit" element={<PaymentForm />} />
+          <Route path="debts" element={<DebtsByPerson />} />
         </Route>
       </Routes>
     </BrowserRouter>
